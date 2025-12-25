@@ -5,13 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Flight Times Timezone Converter</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* THEME VARIABLES */
     :root {
       --bg-main: #e0f2ff;
       --bg-main-2: #f8fbff;
@@ -36,14 +31,15 @@
       --row-alt: #020617;
     }
 
+    /* Body as flex column (for footer) */
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       margin: 0;
       min-height: 100vh;
       display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      padding: 40px 16px;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 16px 0;
       background: linear-gradient(135deg, var(--bg-main), var(--bg-main-2));
       position: relative;
       overflow-x: hidden;
@@ -51,18 +47,15 @@
       transition: background 0.3s ease, color 0.3s ease;
     }
 
-    /* Fullscreen background image using your Unsplash URL [web:83][web:89] */
     .bg-flight {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
       background-image: url("https://images.unsplash.com/photo-1720364170755-5b1f88e02f65?q=80&w=2996&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
-      opacity: 30%;
+      opacity: 0.18;
       z-index: -3;
       pointer-events: none;
     }
@@ -79,6 +72,19 @@
       background: radial-gradient(circle at top, rgba(15,23,42,0.75), rgba(15,23,42,0.96));
     }
 
+    /* Wrap all main UI to apply blur */
+    .page-content {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: filter 0.4s ease;
+    }
+
+    .page-content.blurred {
+      filter: blur(6px);
+    }
+
     .container {
       width: 100%;
       max-width: 960px;
@@ -88,13 +94,11 @@
       box-shadow: 0 10px 25px rgba(15, 23, 42, 0.18);
       padding: 18px 16px 20px;
       backdrop-filter: blur(4px);
-      transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+      margin-bottom: 16px;
     }
 
     @media (min-width: 640px) {
-      .container {
-        padding: 20px 24px 24px;
-      }
+      .container { padding: 20px 24px 24px; }
     }
 
     .header-row {
@@ -106,15 +110,8 @@
       flex-wrap: wrap;
     }
 
-    h1 {
-      font-size: 18px;
-    }
-
-    @media (min-width: 640px) {
-      h1 {
-        font-size: 20px;
-      }
-    }
+    h1 { font-size: 18px; }
+    @media (min-width: 640px) { h1 { font-size: 20px; } }
 
     .controls-row {
       display: flex;
@@ -132,9 +129,7 @@
       flex-wrap: wrap;
     }
 
-    label {
-      font-weight: 600;
-    }
+    label { font-weight: 600; }
 
     select {
       padding: 6px 10px;
@@ -143,14 +138,12 @@
       border: 1px solid var(--table-border);
       background: #ffffff;
     }
-
     body.dark select {
       background: #020617;
       color: var(--text-main);
       border-color: #1f2937;
     }
 
-    /* THEME TOGGLE BUTTON [web:41][web:45][web:49] */
     .theme-toggle {
       display: inline-flex;
       align-items: center;
@@ -166,20 +159,10 @@
       user-select: none;
       white-space: nowrap;
     }
+    body.dark .theme-toggle { background: #020617; }
+    .theme-toggle:hover { transform: translateY(-1px); }
+    .theme-toggle-icon { font-size: 15px; }
 
-    body.dark .theme-toggle {
-      background: #020617;
-    }
-
-    .theme-toggle:hover {
-      transform: translateY(-1px);
-    }
-
-    .theme-toggle-icon {
-      font-size: 15px;
-    }
-
-    /* DESKTOP TABLE */
     table {
       border-collapse: collapse;
       width: 100%;
@@ -194,21 +177,12 @@
       text-align: left;
       font-size: 13px;
     }
-
     @media (min-width: 640px) {
-      th, td {
-        padding: 8px 10px;
-        font-size: 14px;
-      }
+      th, td { padding: 8px 10px; font-size: 14px; }
     }
 
-    th {
-      background: var(--table-header);
-    }
-
-    tbody tr:nth-child(even) {
-      background: var(--row-alt);
-    }
+    th { background: var(--table-header); }
+    tbody tr:nth-child(even) { background: var(--row-alt); }
 
     .timezone-note {
       margin-top: 8px;
@@ -216,20 +190,9 @@
       color: var(--text-muted);
     }
 
-    /* MOBILE: transform table into cards [web:73][web:77][web:80][web:81] */
     @media (max-width: 640px) {
-      table,
-      thead,
-      tbody,
-      th,
-      td,
-      tr {
-        display: block;
-      }
-
-      thead {
-        display: none;
-      }
+      table, thead, tbody, th, td, tr { display: block; }
+      thead { display: none; }
 
       tbody tr {
         margin-bottom: 12px;
@@ -238,14 +201,8 @@
         overflow: hidden;
         background: rgba(255,255,255,0.95);
       }
-
-      body.dark tbody tr {
-        background: #020617;
-      }
-
-      tbody tr:nth-child(even) {
-        background: inherit;
-      }
+      body.dark tbody tr { background: #020617; }
+      tbody tr:nth-child(even) { background: inherit; }
 
       td {
         border: none;
@@ -254,10 +211,7 @@
         padding-left: 50%;
         min-height: 34px;
       }
-
-      td:last-child {
-        border-bottom: none;
-      }
+      td:last-child { border-bottom: none; }
 
       td::before {
         content: attr(data-label);
@@ -269,6 +223,56 @@
         white-space: nowrap;
       }
     }
+
+    footer {
+      width: 100%;
+      max-width: 960px;
+      padding: 8px 16px 12px;
+      font-size: 12px;
+      color: var(--text-muted);
+      text-align: left;
+      position: sticky;
+      bottom: 0;
+      z-index: 1;
+    }
+    body.dark footer {
+      color: #9ca3af;
+    }
+
+    /* FULLSCREEN LOADER OVERLAY WITH VIDEO [web:187][web:188][web:190][web:192] */
+    .loader-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      opacity: 1;
+      pointer-events: all;
+      transition: opacity 0.8s ease;
+    }
+
+    .loader-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loader-video-wrapper {
+      max-width: 90vw;
+      max-height: 70vh;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+
+    .loader-video-wrapper video {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #000;
+    }
   </style>
 </head>
 <body>
@@ -276,96 +280,114 @@
   <div class="bg-flight"></div>
   <div class="bg-overlay"></div>
 
-  <div class="container">
-    <div class="header-row">
-      <h1 id="pageTitle">Flight Schedule (Timezone Converter)</h1>
-
-      <!-- THEME TOGGLE -->
-      <button type="button" id="themeToggle" class="theme-toggle" aria-label="Toggle dark/light theme">
-        <span class="theme-toggle-icon" id="themeIcon">🌙</span>
-        <span id="themeLabel">Dark mode</span>
-      </button>
+  <!-- Loading overlay with MP4 -->
+  <div class="loader-overlay" id="loaderOverlay">
+    <div class="loader-video-wrapper">
+      <video id="loaderVideo" autoplay muted playsinline>
+        <source src="Flying paper airplane casting shadow.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
     </div>
+  </div>
 
-    <div class="controls-row">
-      <div class="controls">
-        <label for="tzSelect">Show times in:</label>
-        <select id="tzSelect">
-          <option value="IST">IST (India Standard Time)</option>
-          <option value="US">US (Pacific Time)</option>
-          <option value="FR">France (Central Europe Time)</option>
-        </select>
+  <!-- Local background music file -->
+  <audio id="bgMusic" preload="auto">
+    <source src="Ghar Aaja Pardesi(KoshalWorld.Com).mp3" type="audio/mpeg" />
+    Your browser does not support the audio element.
+  </audio>
+
+  <!-- Wrap main UI so it can be blurred -->
+  <div class="page-content" id="pageContent">
+    <div class="container">
+      <div class="header-row">
+        <h1 id="pageTitle">Flight Schedule (Timezone Converter)</h1>
+
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button type="button" id="themeToggle" class="theme-toggle" aria-label="Toggle dark/light theme">
+            <span class="theme-toggle-icon" id="themeIcon">🌙</span>
+            <span id="themeLabel">Dark mode</span>
+          </button>
+
+          <button type="button" id="audioToggle" class="theme-toggle" aria-label="Toggle background music">
+            <span id="audioIcon">🔈</span>
+            <span id="audioLabel">Play music</span>
+          </button>
+        </div>
       </div>
+
+      <div class="controls-row">
+        <div class="controls">
+          <label for="tzSelect">Show times in:</label>
+          <select id="tzSelect">
+            <option value="IST">IST (India Standard Time)</option>
+            <option value="US">US (Pacific Time)</option>
+            <option value="FR">France (Central Europe Time)</option>
+          </select>
+        </div>
+      </div>
+
+      <table id="flightTable">
+        <thead>
+          <tr>
+            <th>Flight No</th>
+            <th>Route</th>
+            <th>Departure</th>
+            <th>Arrival</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-label="Flight No">LH 491</td>
+            <td data-label="Route">Seattle → Frankfurt</td>
+            <td class="dep" data-label="Departure"
+                data-ist="2026-06-25T02:40:00+05:30"></td>
+            <td class="arr" data-label="Arrival"
+                data-ist="2026-06-25T12:50:00+05:30"></td>
+          </tr>
+          <tr>
+            <td data-label="Flight No">LH 760</td>
+            <td data-label="Route">Frankfurt → Delhi</td>
+            <td class="dep" data-label="Departure"
+                data-ist="2026-06-25T16:50:00+05:30"></td>
+            <td class="arr" data-label="Arrival"
+                data-ist="2026-06-26T00:55:00+05:30"></td>
+          </tr>
+          <tr>
+            <td data-label="Flight No">LH 763</td>
+            <td data-label="Route">Delhi → Munich</td>
+            <td class="dep" data-label="Departure"
+                data-ist="2026-08-26T01:45:00+05:30"></td>
+            <td class="arr" data-label="Arrival"
+                data-ist="2026-08-26T10:05:00+05:30"></td>
+          </tr>
+          <tr>
+            <td data-label="Flight No">LH 129</td>
+            <td data-label="Route">Munich → Frankfurt</td>
+            <td class="dep" data-label="Departure"
+                data-ist="2026-08-26T12:00:00+05:30"></td>
+            <td class="arr" data-label="Arrival"
+                data-ist="2026-08-26T13:00:00+05:30"></td>
+          </tr>
+          <tr>
+            <td data-label="Flight No">LH 490</td>
+            <td data-label="Route">Frankfurt → Seattle</td>
+            <td class="dep" data-label="Departure"
+                data-ist="2026-08-26T14:15:00+05:30"></td>
+            <td class="arr" data-label="Arrival"
+                data-ist="2026-08-27T00:25:00+05:30"></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="timezone-note" id="tzNote"></div>
     </div>
 
-    <table id="flightTable">
-      <thead>
-        <tr>
-          <th>Flight No</th>
-          <th>Route</th>
-          <th>Departure</th>
-          <th>Arrival</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td data-label="Flight No">LH 491</td>
-          <td data-label="Route">Seattle → Frankfurt</td>
-          <td class="dep"
-              data-label="Departure"
-              data-ist="2026-06-25T02:40:00+05:30"></td>
-          <td class="arr"
-              data-label="Arrival"
-              data-ist="2026-06-25T12:50:00+05:30"></td>
-        </tr>
-        <tr>
-          <td data-label="Flight No">LH 760</td>
-          <td data-label="Route">Frankfurt → Delhi</td>
-          <td class="dep"
-              data-label="Departure"
-              data-ist="2026-06-25T16:50:00+05:30"></td>
-          <td class="arr"
-              data-label="Arrival"
-              data-ist="2026-06-26T00:55:00+05:30"></td>
-        </tr>
-        <tr>
-          <td data-label="Flight No">LH 763</td>
-          <td data-label="Route">Delhi → Munich</td>
-          <td class="dep"
-              data-label="Departure"
-              data-ist="2026-08-26T01:45:00+05:30"></td>
-          <td class="arr"
-              data-label="Arrival"
-              data-ist="2026-08-26T10:05:00+05:30"></td>
-        </tr>
-        <tr>
-          <td data-label="Flight No">LH 129</td>
-          <td data-label="Route">Munich → Frankfurt</td>
-          <td class="dep"
-              data-label="Departure"
-              data-ist="2026-08-26T12:00:00+05:30"></td>
-          <td class="arr"
-              data-label="Arrival"
-              data-ist="2026-08-26T13:00:00+05:30"></td>
-        </tr>
-        <tr>
-          <td data-label="Flight No">LH 490</td>
-          <td data-label="Route">Frankfurt → Seattle</td>
-          <td class="dep"
-              data-label="Departure"
-              data-ist="2026-08-26T14:15:00+05:30"></td>
-          <td class="arr"
-              data-label="Arrival"
-              data-ist="2026-08-27T00:25:00+05:30"></td>
-        </tr>
-      </tbody>
-    </table>
-
-    <div class="timezone-note" id="tzNote"></div>
+    <footer>
+      © All Rights Reserved 2025-26. Anvi Dikshit.
+    </footer>
   </div>
 
   <script>
-    // Format as "DD Mon YYYY – hh:mm AM/PM"
     function formatDisplay(date) {
       const day = String(date.getDate()).padStart(2, "0");
       const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -391,7 +413,7 @@
     function updateTitle(mode) {
       const pageTitle = document.getElementById("pageTitle");
       const label = getTimezoneLabel(mode);
-      pageTitle.textContent = `Flight Schedule – ${label}`;
+      pageTitle.textContent = `Flight Schedule \u2013 ${label}`;
     }
 
     function updateTable() {
@@ -412,7 +434,6 @@
       tzNote.textContent =
         "All times shown below are converted from original IST schedule to " + label + ".";
 
-      // Update heading title to reflect selected timezone
       updateTitle(mode);
 
       const rows = document.querySelectorAll("#flightTable tbody tr");
@@ -437,10 +458,7 @@
 
           const parts = new Intl.DateTimeFormat("en-CA", options)
             .formatToParts(istDate)
-            .reduce((acc, p) => {
-              acc[p.type] = p.value;
-              return acc;
-            }, {});
+            .reduce((acc, p) => { acc[p.type] = p.value; return acc; }, {});
 
           const converted = new Date(
             Number(parts.year),
@@ -457,7 +475,7 @@
 
     document.getElementById("tzSelect").addEventListener("change", updateTable);
 
-    // THEME TOGGLE LOGIC (body.dark class) [web:41][web:45][web:49]
+    // DARK/LIGHT THEME
     const themeToggleBtn = document.getElementById("themeToggle");
     const themeIcon = document.getElementById("themeIcon");
     const themeLabel = document.getElementById("themeLabel");
@@ -478,11 +496,8 @@
 
     (function initTheme() {
       const saved = localStorage.getItem("theme");
-      if (saved === "dark") {
-        applyTheme(true);
-      } else {
-        applyTheme(false);
-      }
+      if (saved === "dark") applyTheme(true);
+      else applyTheme(false);
     })();
 
     themeToggleBtn.addEventListener("click", () => {
@@ -490,7 +505,80 @@
       applyTheme(isDark);
     });
 
-    // Initialize table and title
+    // BACKGROUND MUSIC: start on first user click, then use button
+    const bgMusic = document.getElementById("bgMusic");
+    const audioToggleBtn = document.getElementById("audioToggle");
+    const audioIcon = document.getElementById("audioIcon");
+    const audioLabel = document.getElementById("audioLabel");
+
+    let firstPlayDone = false;
+
+    function setAudioState(playing) {
+      if (!bgMusic) return;
+      if (playing) {
+        bgMusic.muted = false;
+        bgMusic.play().catch(() => {});
+        audioIcon.textContent = "🔊";
+        audioLabel.textContent = "Pause music";
+        localStorage.setItem("bgMusic", "on");
+      } else {
+        bgMusic.pause();
+        audioIcon.textContent = "🔈";
+        audioLabel.textContent = "Play music";
+        localStorage.setItem("bgMusic", "off");
+      }
+    }
+
+    document.addEventListener("click", function handleFirstClick() {
+      if (firstPlayDone || !bgMusic) return;
+      firstPlayDone = true;
+
+      bgMusic.volume = 0.7;
+      setAudioState(true);
+
+      document.removeEventListener("click", handleFirstClick);
+    }, { once: true });
+
+    (function initAudio() {
+      const saved = localStorage.getItem("bgMusic");
+      if (saved === "on") {
+        audioIcon.textContent = "🔊";
+        audioLabel.textContent = "Pause music";
+      } else {
+        audioIcon.textContent = "🔈";
+        audioLabel.textContent = "Play music";
+      }
+    })();
+
+    if (audioToggleBtn) {
+      audioToggleBtn.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const isPlaying = !bgMusic.paused && !bgMusic.muted;
+        setAudioState(!isPlaying);
+      });
+    }
+
+    // LOADER: blur page and fade out after 5s [web:187][web:188][web:190][web:192]
+    const loaderOverlay = document.getElementById("loaderOverlay");
+    const pageContent = document.getElementById("pageContent");
+
+    // Start blurred
+    pageContent.classList.add("blurred");
+
+    window.addEventListener("load", () => {
+      setTimeout(() => {
+        // remove blur
+        pageContent.classList.remove("blurred");
+        // fade out loader
+        loaderOverlay.classList.add("hidden");
+        // after fade completes, set display:none to free clicks
+        setTimeout(() => {
+          loaderOverlay.style.display = "none";
+        }, 900);
+      }, 5000);
+    });
+
+    // Initialize table + title
     updateTable();
   </script>
 </body>
