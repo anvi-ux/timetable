@@ -31,7 +31,6 @@
       --row-alt: #020617;
     }
 
-    /* Body as flex column (for footer) */
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       margin: 0;
@@ -72,7 +71,6 @@
       background: radial-gradient(circle at top, rgba(15,23,42,0.75), rgba(15,23,42,0.96));
     }
 
-    /* Wrap all main UI to apply blur */
     .page-content {
       width: 100%;
       display: flex;
@@ -239,11 +237,11 @@
       color: #9ca3af;
     }
 
-    /* Loader overlay + video (lighter + smaller) [web:187][web:190][web:192] */
+    /* Loader overlay + video */
     .loader-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.55); /* lighter */
+      background: rgba(0, 0, 0, 0.55);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -259,8 +257,8 @@
     }
 
     .loader-video-wrapper {
-      max-width: 60vw;  /* smaller */
-      max-height: 40vh; /* smaller */
+      max-width: 60vw;
+      max-height: 40vh;
       border-radius: 12px;
       overflow: hidden;
       box-shadow: 0 14px 30px rgba(0,0,0,0.45);
@@ -271,7 +269,7 @@
       width: 100%;
       height: 100%;
       object-fit: contain;
-      opacity: 0.6;        /* reduce video opacity */
+      opacity: 0.6;
       background: #000;
     }
   </style>
@@ -291,13 +289,13 @@
     </div>
   </div>
 
-  <!-- Local background music file (same folder) -->
+  <!-- Local background music file -->
   <audio id="bgMusic" preload="auto">
     <source src="Ghar Aaja Pardesi(KoshalWorld.Com).mp3" type="audio/mpeg" />
     Your browser does not support the audio element.
   </audio>
 
-  <!-- Wrap main UI so it can be blurred -->
+  <!-- Main content -->
   <div class="page-content" id="pageContent">
     <div class="container">
       <div class="header-row">
@@ -384,7 +382,7 @@
     </div>
 
     <footer>
-      © All Rights Reserved 2025-26. Anvi Dikshit. (v1.05)
+      © All Rights Reserved 2025-26. Anvi Dikshit. V(1.06)
     </footer>
   </div>
 
@@ -506,11 +504,13 @@
       applyTheme(isDark);
     });
 
-    // BACKGROUND MUSIC: play/pause only via button (better for policies) [web:103][web:140][web:148][web:159]
+    // BACKGROUND MUSIC: start on first click anywhere, keep button in sync [web:103][web:110][web:205][web:211]
     const bgMusic = document.getElementById("bgMusic");
     const audioToggleBtn = document.getElementById("audioToggle");
     const audioIcon = document.getElementById("audioIcon");
     const audioLabel = document.getElementById("audioLabel");
+
+    let hasStartedFromClick = false;
 
     function setAudioState(playing) {
       if (!bgMusic) return;
@@ -540,20 +540,36 @@
       }
     })();
 
+    // First click anywhere on the page starts music (if not already started)
+    document.addEventListener("click", function handleFirstClick() {
+      if (!bgMusic || hasStartedFromClick) return;
+      hasStartedFromClick = true;
+
+      // If user preference was "off", do not auto-play; otherwise start.
+      const saved = localStorage.getItem("bgMusic");
+      if (saved !== "off") {
+        setAudioState(true);
+      }
+
+      // After first click, we no longer need this listener.
+      document.removeEventListener("click", handleFirstClick);
+    });
+
+    // Play / pause on button click; also counts as user interaction
     if (audioToggleBtn) {
       audioToggleBtn.addEventListener("click", (event) => {
-        event.stopPropagation();
+        event.stopPropagation(); // so global handler doesn't run twice
         if (!bgMusic) return;
         const isPlaying = !bgMusic.paused && !bgMusic.ended;
         setAudioState(!isPlaying);
+        hasStartedFromClick = true;
       });
     }
 
-    // LOADER: blur page and fade out after 5s [web:187][web:190][web:192]
+    // LOADER: blur page and fade out after 5s
     const loaderOverlay = document.getElementById("loaderOverlay");
     const pageContent = document.getElementById("pageContent");
 
-    // Start blurred
     pageContent.classList.add("blurred");
 
     window.addEventListener("load", () => {
