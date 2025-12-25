@@ -51,23 +51,21 @@
       transition: background 0.3s ease, color 0.3s ease;
     }
 
-    /* Fullscreen background image (working Unsplash airplane image) [web:72] */
-    /* Fullscreen background image using your URL */
-.bg-flight {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-image: url("https://images.unsplash.com/photo-1720364170755-5b1f88e02f65?q=80&w=2996&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  opacity: 0.18;
-  z-index: -3;
-  pointer-events: none;
-}
-
+    /* Fullscreen background image using your Unsplash URL [web:83][web:89] */
+    .bg-flight {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-image: url("https://images.unsplash.com/photo-1720364170755-5b1f88e02f65?q=80&w=2996&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      opacity: 30%;
+      z-index: -3;
+      pointer-events: none;
+    }
 
     .bg-overlay {
       position: fixed;
@@ -152,7 +150,7 @@
       border-color: #1f2937;
     }
 
-    /* THEME TOGGLE BUTTON */
+    /* THEME TOGGLE BUTTON [web:41][web:45][web:49] */
     .theme-toggle {
       display: inline-flex;
       align-items: center;
@@ -230,7 +228,7 @@
       }
 
       thead {
-        display: none; /* hide header on mobile */
+        display: none;
       }
 
       tbody tr {
@@ -246,7 +244,7 @@
       }
 
       tbody tr:nth-child(even) {
-        background: inherit; /* card already has its own background */
+        background: inherit;
       }
 
       td {
@@ -280,7 +278,7 @@
 
   <div class="container">
     <div class="header-row">
-      <h1>Flight Schedule (Timezone Converter)</h1>
+      <h1 id="pageTitle">Flight Schedule (Timezone Converter)</h1>
 
       <!-- THEME TOGGLE -->
       <button type="button" id="themeToggle" class="theme-toggle" aria-label="Toggle dark/light theme">
@@ -384,6 +382,18 @@
       return `${day} ${month} ${year} \u2013 ${hh}:${minutes} ${ampm}`;
     }
 
+    function getTimezoneLabel(mode) {
+      if (mode === "US") return "US (Pacific Time)";
+      if (mode === "FR") return "France (Central Europe Time)";
+      return "IST (India Standard Time)";
+    }
+
+    function updateTitle(mode) {
+      const pageTitle = document.getElementById("pageTitle");
+      const label = getTimezoneLabel(mode);
+      pageTitle.textContent = `Flight Schedule – ${label}`;
+    }
+
     function updateTable() {
       const select = document.getElementById("tzSelect");
       const tzNote = document.getElementById("tzNote");
@@ -401,6 +411,9 @@
 
       tzNote.textContent =
         "All times shown below are converted from original IST schedule to " + label + ".";
+
+      // Update heading title to reflect selected timezone
+      updateTitle(mode);
 
       const rows = document.querySelectorAll("#flightTable tbody tr");
 
@@ -444,7 +457,7 @@
 
     document.getElementById("tzSelect").addEventListener("change", updateTable);
 
-    // THEME TOGGLE LOGIC (body.dark class)
+    // THEME TOGGLE LOGIC (body.dark class) [web:41][web:45][web:49]
     const themeToggleBtn = document.getElementById("themeToggle");
     const themeIcon = document.getElementById("themeIcon");
     const themeLabel = document.getElementById("themeLabel");
@@ -477,7 +490,7 @@
       applyTheme(isDark);
     });
 
-    // Initialize table
+    // Initialize table and title
     updateTable();
   </script>
 </body>
