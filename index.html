@@ -239,11 +239,11 @@
       color: #9ca3af;
     }
 
-    /* FULLSCREEN LOADER OVERLAY WITH VIDEO [web:187][web:188][web:190][web:192] */
+    /* Loader overlay + video (lighter + smaller) [web:187][web:190][web:192] */
     .loader-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.85);
+      background: rgba(0, 0, 0, 0.55); /* lighter */
       display: flex;
       align-items: center;
       justify-content: center;
@@ -259,11 +259,11 @@
     }
 
     .loader-video-wrapper {
-      max-width: 90vw;
-      max-height: 70vh;
+      max-width: 60vw;  /* smaller */
+      max-height: 40vh; /* smaller */
       border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      box-shadow: 0 14px 30px rgba(0,0,0,0.45);
     }
 
     .loader-video-wrapper video {
@@ -271,6 +271,7 @@
       width: 100%;
       height: 100%;
       object-fit: contain;
+      opacity: 0.6;        /* reduce video opacity */
       background: #000;
     }
   </style>
@@ -290,7 +291,7 @@
     </div>
   </div>
 
-  <!-- Local background music file -->
+  <!-- Local background music file (same folder) -->
   <audio id="bgMusic" preload="auto">
     <source src="Ghar Aaja Pardesi(KoshalWorld.Com).mp3" type="audio/mpeg" />
     Your browser does not support the audio element.
@@ -383,7 +384,7 @@
     </div>
 
     <footer>
-      © All Rights Reserved 2025-26. Anvi Dikshit.
+      © All Rights Reserved 2025-26. Anvi Dikshit. (v1.05)
     </footer>
   </div>
 
@@ -505,18 +506,17 @@
       applyTheme(isDark);
     });
 
-    // BACKGROUND MUSIC: start on first user click, then use button
+    // BACKGROUND MUSIC: play/pause only via button (better for policies) [web:103][web:140][web:148][web:159]
     const bgMusic = document.getElementById("bgMusic");
     const audioToggleBtn = document.getElementById("audioToggle");
     const audioIcon = document.getElementById("audioIcon");
     const audioLabel = document.getElementById("audioLabel");
 
-    let firstPlayDone = false;
-
     function setAudioState(playing) {
       if (!bgMusic) return;
       if (playing) {
         bgMusic.muted = false;
+        bgMusic.volume = 0.7;
         bgMusic.play().catch(() => {});
         audioIcon.textContent = "🔊";
         audioLabel.textContent = "Pause music";
@@ -528,16 +528,6 @@
         localStorage.setItem("bgMusic", "off");
       }
     }
-
-    document.addEventListener("click", function handleFirstClick() {
-      if (firstPlayDone || !bgMusic) return;
-      firstPlayDone = true;
-
-      bgMusic.volume = 0.7;
-      setAudioState(true);
-
-      document.removeEventListener("click", handleFirstClick);
-    }, { once: true });
 
     (function initAudio() {
       const saved = localStorage.getItem("bgMusic");
@@ -553,12 +543,13 @@
     if (audioToggleBtn) {
       audioToggleBtn.addEventListener("click", (event) => {
         event.stopPropagation();
-        const isPlaying = !bgMusic.paused && !bgMusic.muted;
+        if (!bgMusic) return;
+        const isPlaying = !bgMusic.paused && !bgMusic.ended;
         setAudioState(!isPlaying);
       });
     }
 
-    // LOADER: blur page and fade out after 5s [web:187][web:188][web:190][web:192]
+    // LOADER: blur page and fade out after 5s [web:187][web:190][web:192]
     const loaderOverlay = document.getElementById("loaderOverlay");
     const pageContent = document.getElementById("pageContent");
 
@@ -567,11 +558,8 @@
 
     window.addEventListener("load", () => {
       setTimeout(() => {
-        // remove blur
         pageContent.classList.remove("blurred");
-        // fade out loader
         loaderOverlay.classList.add("hidden");
-        // after fade completes, set display:none to free clicks
         setTimeout(() => {
           loaderOverlay.style.display = "none";
         }, 900);
